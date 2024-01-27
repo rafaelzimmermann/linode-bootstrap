@@ -1,0 +1,6 @@
+#!/bin/bash
+
+for id in $(linode-cli linodes ls --json | jq ".[].id"); do
+    echo "Deleting ${id}"
+    linode-cli linodes delete $id
+done

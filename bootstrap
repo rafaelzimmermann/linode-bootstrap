@@ -1,0 +1,15 @@
+#!/bin/bash
+
+useradd -m spike
+adduser spike sudo
+
+apt update
+apt install -y git
+
+mkdir -p /home/spike/workspace
+mkdir -p /home/spike/.ssh
+git clone https://github.com/rafaelzimmermann/linux-bootstrap.git /home/spike/workspace/linux-bootstrap
+
+chown -R spike: /home/spike
+
+

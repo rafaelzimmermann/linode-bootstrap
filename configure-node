@@ -1,0 +1,35 @@
+#!/bin/bash
+
+linode_id=$1
+
+if [ -z $linode_id ]; then
+    echo "Usage: configure-node <id>"
+    exit 1
+fi
+
+
+if [ "$(linode-cli linodes ls --json --suppress-warnings | jq ".[].id" | grep $linode_id)z" = "z" ]; then
+    echo "Invalid linode id"
+    exit 1
+fi
+
+
+if [ $(linode-cli linodes view $linode_id --json --suppress-warnings | jq -r ".[].status") != "running" ]; then
+    echo "Linode is not ready"
+    exit 1
+fi
+
+linode_ip=$(linode-cli linodes view $linode_id --json --suppress-warnings | jq -r ".[].ipv4[0]")
+
+
+ssh root@$linode_ip 'bash -s' < ./bootstrap
+
+read -p "Node username: " username
+
+scp $HOME/.ssh/id_ed25519.pub root@$linode_ip:/home/$username/.ssh/authorized_keys
+chown -R $username: /home/$username/.ssh/authorized_keys
+
+echo "Enter $username password"
+read pass
+
+ssh root@$linode_ip "echo "username:newpass"|chpasswd"

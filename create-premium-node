@@ -1,0 +1,16 @@
+#!/bin/bash
+
+read -p "Root passwd: " rootpass
+
+linode-cli linodes create \
+  --authorized_users tmpfile \
+  --backups_enabled false \
+  --booted true \
+  --firewall_id 307432 \
+  --image 'linode/ubuntu23.10' \
+  --label ubuntu-nl-ams-001 \
+  --private_ip false \
+  --region nl-ams \
+  --root_pass "${rootpass}" \
+  --type g7-premium-2
+

@@ -1,0 +1,37 @@
+#!/bin/bash
+
+linode_index=$(linode-cli linodes ls --json | jq ".[].id" | wc -l)
+
+read -p "Root passwd: " rootpass
+
+linode_id=$(\
+  linode-cli linodes create \
+    --authorized_users tmpfile \
+    --backups_enabled false \
+    --booted true \
+    --firewall_id 307432 \
+    --image 'linode/ubuntu23.10' \
+    --label "ubuntu-nl-ams-${linode_index}" \
+    --private_ip false \
+    --region nl-ams \
+    --root_pass "${rootpass}" \
+    --type g6-nanode-1 \
+    --json \
+    --suppress-warnings |\
+  jq ".[].id")
+
+echo "Linode ${linode_id}"
+
+echo "Waiting node to change state to running"
+status=$(linode-cli linodes view $linode_id --json --suppress-warnings | jq ".[].status" | xargs echo -n)
+echo $status
+until [ $status == "running" ]; do
+  new_status=$(linode-cli linodes view $linode_id --json --suppress-warnings | jq ".[].status" | xargs echo -n)
+  echo -n "."
+  sleep 1s
+  if [ $status != $new_status ]; then
+    status=$new_status
+    echo ""
+    echo $status
+  fi
+done
