@@ -1,15 +1,21 @@
 #!/bin/bash
 
-useradd -m spike
-adduser spike sudo
+username=$1
+
+useradd -m $username
+adduser $username sudo
 
 apt update
 apt install -y git
 
-mkdir -p /home/spike/workspace
-mkdir -p /home/spike/.ssh
-git clone https://github.com/rafaelzimmermann/linux-bootstrap.git /home/spike/workspace/linux-bootstrap
+userhome="/home/${username}"
 
-chown -R spike: /home/spike
+mkdir -p $userhome/workspace
+mkdir -p $userhome/.ssh
+git clone https://github.com/rafaelzimmermann/linux-bootstrap.git $userhome/workspace/linux-bootstrap
+
+chown -R $username: $userhome
+
+bash $userhome/workspace/linux-bootstrap/bootstrap
 
 

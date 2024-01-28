@@ -2,8 +2,12 @@
 
 linode_id=$1
 
+username=$2
+
 if [ -z $linode_id ]; then
-    echo "Usage: configure-node <id>"
+    echo "Usage: configure-node <linode-id> <username>"
+    echo "  - linode-id: The node id to be configured"
+    echo "  - username: The user to be added to the node"
     exit 1
 fi
 
@@ -22,7 +26,7 @@ fi
 linode_ip=$(linode-cli linodes view $linode_id --json --suppress-warnings | jq -r ".[].ipv4[0]")
 
 
-ssh root@$linode_ip 'bash -s' < ./bootstrap
+ssh root@$linode_ip 'bash -s' < ./bootstrap $username
 
 read -p "Node username: " username
 
