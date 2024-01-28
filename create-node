@@ -20,18 +20,36 @@ linode_id=$(\
     --suppress-warnings |\
   jq ".[].id")
 
+echo ""
 echo "Linode ${linode_id}"
+echo ""
 
 echo "Waiting node to change state to running"
+echo ""
+
 status=$(linode-cli linodes view $linode_id --json --suppress-warnings | jq ".[].status" | xargs echo -n)
 echo $status
-until [ $status == "running" ]; do
+until [ "${status}" == "running" ]; do
   new_status=$(linode-cli linodes view $linode_id --json --suppress-warnings | jq ".[].status" | xargs echo -n)
   echo -n "."
-  sleep 1s
-  if [ $status != $new_status ]; then
-    status=$new_status
+  sleep 1
+  if [ "${status}" != "${new_status}" ]; then
+    status="${new_status}"
     echo ""
-    echo $status
+    echo "${status}"
   fi
 done
+
+
+linode_ip=$(linode-cli linodes view $linode_id --json --suppress-warnings | jq -r ".[].ipv4[0]")
+
+echo "Waiting server to starting listening ssh port"
+echo ""
+
+while ! ssh "root@${linode_ip}" 'uptime'
+do
+    echo -n "."
+    sleep 1
+done
+
+echo ""

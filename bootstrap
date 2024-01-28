@@ -12,10 +12,16 @@ userhome="/home/${username}"
 
 mkdir -p $userhome/workspace
 mkdir -p $userhome/.ssh
+
+rm -rf $userhome/workspace/linux-bootstrap
 git clone https://github.com/rafaelzimmermann/linux-bootstrap.git $userhome/workspace/linux-bootstrap
 
 chown -R $username: $userhome
 
-bash $userhome/workspace/linux-bootstrap/bootstrap
+cd $userhome/workspace/linux-bootstrap/
+./bootstrap
+
+echo "Defining $username passwd"
+passwd $username
 
 

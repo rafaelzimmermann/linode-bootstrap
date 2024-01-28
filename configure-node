@@ -33,7 +33,3 @@ read -p "Node username: " username
 scp $HOME/.ssh/id_ed25519.pub root@$linode_ip:/home/$username/.ssh/authorized_keys
 chown -R $username: /home/$username/.ssh/authorized_keys
 
-echo "Enter $username password"
-read pass
-
-ssh root@$linode_ip "echo "username:newpass"|chpasswd"
